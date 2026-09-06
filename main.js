@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import { createVoidOrrery } from './void-orrery.js';
+import { createHolographicRelics } from './holographic-relics.js';
+
+const holographicRelics = createHolographicRelics();
 
 const Spec = {
   length: 140,
@@ -1061,146 +1064,10 @@ function loadAmbienceWideTexture(idx) {
   return tex;
 }
 
-function makeAquila(scale = 1) {
-  const g = new THREE.Group();
-  const s = scale;
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.35 * s, 0.7 * s, 0.18 * s), aquilaDark);
-  body.position.set(0, 0.05 * s, 0);
-  g.add(body);
-  const torsoTrim = new THREE.Mesh(new THREE.BoxGeometry(0.22 * s, 0.55 * s, 0.2 * s), aquilaGold);
-  torsoTrim.position.set(0, 0.08 * s, 0.02 * s);
-  g.add(torsoTrim);
-  // Twin head suggestion
-  for (const hx of [-0.18, 0.18]) {
-    const head = new THREE.Mesh(new THREE.BoxGeometry(0.22 * s, 0.28 * s, 0.2 * s), aquilaBone);
-    head.position.set(hx * s, 0.52 * s, 0.02 * s);
-    head.rotation.z = hx > 0 ? -0.35 : 0.35;
-    g.add(head);
-    const beak = new THREE.Mesh(new THREE.BoxGeometry(0.1 * s, 0.08 * s, 0.16 * s), aquilaGold);
-    beak.position.set(hx * s * 1.35, 0.48 * s, 0.06 * s);
-    g.add(beak);
-  }
-  // Wing fans — stepped boxes
-  for (const side of [-1, 1]) {
-    for (let w = 0; w < 4; w++) {
-      const ww = 0.55 * s + w * 0.22 * s;
-      const wh = 0.28 * s - w * 0.04 * s;
-      const feather = new THREE.Mesh(new THREE.BoxGeometry(ww, wh, 0.1 * s), w % 2 === 0 ? aquilaDark : aquilaBone);
-      feather.position.set(side * (0.45 * s + w * 0.28 * s), 0.15 * s - w * 0.12 * s, -0.02 * s);
-      feather.rotation.z = side * (0.55 - w * 0.08);
-      feather.rotation.y = side * 0.12;
-      g.add(feather);
-    }
-    const tip = new THREE.Mesh(new THREE.BoxGeometry(0.35 * s, 0.12 * s, 0.08 * s), aquilaGold);
-    tip.position.set(side * 1.45 * s, -0.25 * s, 0);
-    tip.rotation.z = side * 0.4;
-    g.add(tip);
-  }
-  // Tail fan
-  for (let t = 0; t < 3; t++) {
-    const tail = new THREE.Mesh(new THREE.BoxGeometry(0.18 * s, 0.4 * s, 0.08 * s), t === 1 ? aquilaGold : aquilaDark);
-    tail.position.set((t - 1) * 0.16 * s, -0.45 * s, 0);
-    tail.rotation.z = (t - 1) * 0.25;
-    g.add(tail);
-  }
-  return g;
-}
-
-/**
- * Skull + wing plaque variant for banner alternation.
- * @param {number} scale
- * @returns {THREE.Group}
- */
-function makeWingedSkull(scale = 1) {
-  const g = new THREE.Group();
-  const s = scale;
-  const skull = new THREE.Mesh(new THREE.SphereGeometry(0.32 * s, 8, 6), aquilaBone);
-  skull.position.set(0, 0.08 * s, 0.04 * s);
-  skull.scale.set(1, 0.95, 0.9);
-  g.add(skull);
-  const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.38 * s, 0.14 * s, 0.28 * s), aquilaBone);
-  jaw.position.set(0, -0.18 * s, 0.06 * s);
-  g.add(jaw);
-  for (const sx of [-0.12, 0.12]) {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.07 * s, 5, 5), aquilaDark);
-    eye.position.set(sx * s, 0.12 * s, 0.28 * s);
-    g.add(eye);
-  }
-  for (const side of [-1, 1]) {
-    for (let w = 0; w < 3; w++) {
-      const feather = new THREE.Mesh(
-        new THREE.BoxGeometry(0.45 * s + w * 0.15 * s, 0.16 * s, 0.07 * s),
-        w === 1 ? aquilaGold : aquilaDark,
-      );
-      feather.position.set(side * (0.4 * s + w * 0.22 * s), 0.05 * s - w * 0.08 * s, 0);
-      feather.rotation.z = side * (0.45 - w * 0.06);
-      g.add(feather);
-    }
-  }
-  return g;
-}
-
-/**
- * Invented cross-in-circle wall icon (not a licensed mark).
- * @param {number} scale
- * @returns {THREE.Group}
- */
-function makeCruxIcon(scale = 1) {
-  const g = new THREE.Group();
-  const s = scale;
-  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.85 * s, 0.85 * s, 0.12 * s, 16), aquilaDark);
-  disc.rotation.x = Math.PI / 2;
-  g.add(disc);
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.85 * s, 0.06 * s, 6, 20), aquilaGold);
-  g.add(rim);
-  const armH = new THREE.Mesh(new THREE.BoxGeometry(1.35 * s, 0.28 * s, 0.14 * s), aquilaBone);
-  g.add(armH);
-  const armV = new THREE.Mesh(new THREE.BoxGeometry(0.28 * s, 1.35 * s, 0.14 * s), aquilaBone);
-  g.add(armV);
-  const gem = new THREE.Mesh(new THREE.BoxGeometry(0.22 * s, 0.22 * s, 0.18 * s), aquilaGold);
-  gem.position.z = 0.04 * s;
-  g.add(gem);
-  // Corner studs
-  for (const a of [0.55, -0.55]) {
-    for (const b of [0.55, -0.55]) {
-      const stud = new THREE.Mesh(new THREE.BoxGeometry(0.14 * s, 0.14 * s, 0.12 * s), aquilaGold);
-      stud.position.set(a * s, b * s, 0.02 * s);
-      g.add(stud);
-    }
-  }
-  return g;
-}
-
-/**
- * Wall-mounted servo-arm bracket (folded, shallow into aisle).
- * @param {number} scale
- * @returns {THREE.Group}
- */
-function makeServoBracket(scale = 1) {
-  const g = new THREE.Group();
-  const s = scale;
-  const plate = new THREE.Mesh(new THREE.BoxGeometry(0.7 * s, 0.9 * s, 0.12 * s), aquilaDark);
-  g.add(plate);
-  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.16 * s, 0.18 * s, 0.22 * s, 8), aquilaGold);
-  hub.rotation.z = Math.PI / 2;
-  hub.position.set(0, 0.1 * s, 0.18 * s);
-  g.add(hub);
-  const upper = new THREE.Mesh(new THREE.BoxGeometry(0.18 * s, 0.85 * s, 0.18 * s), aquilaDark);
-  upper.position.set(0, -0.25 * s, 0.35 * s);
-  upper.rotation.x = 0.55;
-  g.add(upper);
-  const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.14 * s, 6, 6), aquilaGold);
-  elbow.position.set(0, -0.55 * s, 0.55 * s);
-  g.add(elbow);
-  const lower = new THREE.Mesh(new THREE.BoxGeometry(0.14 * s, 0.7 * s, 0.14 * s), aquilaDark);
-  lower.position.set(0, -0.85 * s, 0.45 * s);
-  lower.rotation.x = -0.65;
-  g.add(lower);
-  const claw = new THREE.Mesh(new THREE.BoxGeometry(0.35 * s, 0.1 * s, 0.2 * s), aquilaBone);
-  claw.position.set(0, -1.15 * s, 0.28 * s);
-  g.add(claw);
-  return g;
-}
+// Holographic replacements retain the existing placement and scale contracts.
+function makeAquila(scale = 1) { return holographicRelics.seal(scale, 0); }
+function makeWingedSkull(scale = 1) { return holographicRelics.seal(scale, 1); }
+function makeServoBracket(scale = 1) { return holographicRelics.seal(scale * 0.6, 2); }
 
 /**
  * Relics / ritual clutter readable from the rail. Shared mats; no extra PointLights.
@@ -1403,7 +1270,7 @@ function addRelicDetails(group, ctx) {
     }
   }
 
-  // --- Skull niches in walls ---
+  // --- Memory-orb niches in walls ---
   for (let i = 0; i < 5; i++) {
     const x = -halfL + 22 + i * ((length - 48) / 4);
     for (const side of [-1, 1]) {
@@ -1419,7 +1286,7 @@ function addRelicDetails(group, ctx) {
     }
   }
 
-  // Stacked skull piles near a few columns
+  // Small luminous memory clusters near a few columns
   for (let i = 0; i < 4; i++) {
     const p = columnBases[i * 3 + 1];
     if (!p) continue;
@@ -1437,14 +1304,16 @@ function addRelicDetails(group, ctx) {
     const x = tombXs[i];
     const side = i % 2 === 0 ? -1 : 1;
     const z = side * (halfW * 0.95);
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.4, 2.4), stoneWarm);
+    const slab = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.06, 1.4, 48), stoneWarm);
     slab.position.set(x, 0.7, z);
+    slab.scale.set(2.6, 1, 1.12);
     slab.castShadow = true;
     slab.receiveShadow = true;
     group.add(slab);
 
-    const lid = new THREE.Mesh(new THREE.BoxGeometry(5.7, 0.35, 2.55), stone);
-    lid.position.set(x, 1.55, z);
+    const lid = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.25, 48), stone);
+    lid.position.set(x, 1.52, z);
+    lid.scale.set(2.75, 1, 1.22);
     lid.castShadow = true;
     group.add(lid);
 
@@ -1500,7 +1369,7 @@ function addRelicDetails(group, ctx) {
     }
   }
 
-  // --- Munition / relic crates ---
+  // --- Suspended crystal and memory-orb reliquaries ---
   const crateSpots = [
     [-halfL + 14, -1, halfW * 0.85],
     [-halfL + 16.2, -1, halfW * 0.85],
@@ -1514,22 +1383,10 @@ function addRelicDetails(group, ctx) {
   ];
   for (let i = 0; i < crateSpots.length; i++) {
     const [cx, cyOff, cz] = crateSpots[i];
-    const sx = 1.4 + (i % 3) * 0.2;
-    const sy = 0.9 + (i % 2) * 0.15;
-    const sz = 1.1 + (i % 2) * 0.2;
-    const crate = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), crateWood);
-    crate.position.set(cx, sy * 0.5 + (cyOff > 0 ? 0.95 : 0), cz);
-    crate.rotation.y = (i % 5) * 0.15;
-    crate.castShadow = true;
-    crate.receiveShadow = true;
-    group.add(crate);
-
-    // Metal band
-    const band = new THREE.Mesh(new THREE.BoxGeometry(sx + 0.04, 0.12, sz + 0.04), metal);
-    band.position.copy(crate.position);
-    band.position.y += 0.05;
-    band.rotation.y = crate.rotation.y;
-    group.add(band);
+    const relic = holographicRelics.relic(0.7 + (i % 3) * 0.10, i % 2);
+    relic.position.set(cx, 0.95 + (cyOff > 0 ? 1.35 : 0), cz);
+    relic.rotation.y = (i % 5) * 0.35;
+    group.add(relic);
   }
 
   // --- Extra hanging chains + censers (Illustrator emblem discs) ---
@@ -1645,7 +1502,7 @@ function addRelicDetails(group, ctx) {
     ];
     for (const [x, y, side] of spots) {
       const z = side * (halfW + aisle * 0.05) - side * 0.28;
-      const back = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.6, 0.12), aquilaDark);
+      const back = new THREE.Mesh(new THREE.TorusGeometry(1.86, 0.025, 4, 64), aquilaGold);
       back.position.set(x, y, z + side * 0.06);
       group.add(back);
       const relief = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), reliefMat);
@@ -1679,8 +1536,9 @@ function addRelicDetails(group, ctx) {
       side: THREE.DoubleSide,
     });
     for (const [sz, y, z] of [[2.6, 8.6, halfW * 0.55], [2.2, 7.9, -halfW * 0.58]]) {
-      const back = new THREE.Mesh(new THREE.BoxGeometry(0.14, sz * 1.05, sz * 1.05), aquilaDark);
+      const back = new THREE.Mesh(new THREE.TorusGeometry(sz * 0.75, 0.025, 4, 64), aquilaGold);
       back.position.set(halfL - 5.2, y, z);
+      back.rotation.y = -Math.PI / 2;
       group.add(back);
       const crest = new THREE.Mesh(new THREE.PlaneGeometry(sz, sz), crestMat);
       crest.position.set(halfL - 5.32, y, z);
@@ -1737,21 +1595,9 @@ function addRelicDetails(group, ctx) {
 
 /** @param {THREE.Group} group */
 function addSkull(group, x, y, z, scale) {
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.55 * scale, 8, 6), bone);
-  head.position.set(x, y + 0.35 * scale, z);
-  head.scale.set(1, 0.95, 1.15);
-  group.add(head);
-
-  const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.7 * scale, 0.28 * scale, 0.55 * scale), bone);
-  jaw.position.set(x, y + 0.02 * scale, z + 0.12 * scale);
-  group.add(jaw);
-
-  const socketL = new THREE.Mesh(new THREE.SphereGeometry(0.12 * scale, 5, 5), stoneDark);
-  socketL.position.set(x - 0.18 * scale, y + 0.4 * scale, z + 0.42 * scale);
-  group.add(socketL);
-  const socketR = new THREE.Mesh(new THREE.SphereGeometry(0.12 * scale, 5, 5), stoneDark);
-  socketR.position.set(x + 0.18 * scale, y + 0.4 * scale, z + 0.42 * scale);
-  group.add(socketR);
+  const memory = holographicRelics.relic(scale * 0.75, 1);
+  memory.position.set(x, y + 0.35 * scale, z);
+  group.add(memory);
 }
 
 /**
@@ -2410,181 +2256,9 @@ function clampCameraPos(pos, halfL, halfW, chandeliers) {
   return pos;
 }
 
-/**
- * Procedural full-body power-armored cathedral marine (Bastion / Three).
- * Stands on the raised altar/apse platform ("diocese") near the stained glass,
- * facing the nave (-X) so the ceremonial glass rail frames marine + glass.
- * @returns {{ group: THREE.Group, head: THREE.Object3D, update: (dt: number, t: number, cam: THREE.Camera) => void }}
- */
+/** Bastion is a smooth, spectral projection above his original altar. */
 function makeCathedralMarine(halfL) {
-  const gunmetal = new THREE.MeshStandardMaterial({
-    color: 0x2a2e36,
-    roughness: 0.55,
-    metalness: 0.72,
-  });
-  const gunmetalDark = new THREE.MeshStandardMaterial({
-    color: 0x1a1c22,
-    roughness: 0.62,
-    metalness: 0.78,
-  });
-  const visor = new THREE.MeshStandardMaterial({
-    color: 0x40e8f8,
-    emissive: 0x28c8e0,
-    emissiveIntensity: 1.9,
-    roughness: 0.25,
-    metalness: 0.4,
-  });
-  const capeMat = new THREE.MeshStandardMaterial({
-    color: 0x4a1820,
-    roughness: 0.9,
-    metalness: 0.05,
-    side: THREE.DoubleSide,
-  });
-
-  const root = new THREE.Group();
-  // Raised altar top: altar mesh at (halfL-10, 1.6, 0), height 3.2 → top Y = 3.2
-  const baseX = halfL - 10;
-  const baseY = 3.2;
-  const baseZ = 0;
-  root.position.set(baseX, baseY, baseZ);
-  // Model faces +Z by default; yaw -π/2 → face nave (-X)
-  const faceYaw = -Math.PI / 2;
-
-  // Small plinth on altar top (not mid-nave dais)
-  const dais = new THREE.Mesh(new THREE.CylinderGeometry(1.35, 1.5, 0.4, 10), gunmetalDark);
-  dais.position.y = 0.2;
-  dais.castShadow = true;
-  dais.receiveShadow = true;
-  root.add(dais);
-  const daisRim = new THREE.Mesh(new THREE.CylinderGeometry(1.55, 1.6, 0.1, 10), gunmetal);
-  daisRim.position.y = 0.42;
-  root.add(daisRim);
-
-  const body = new THREE.Group();
-  body.position.y = 0.45;
-  root.add(body);
-
-  function part(geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) {
-    const m = new THREE.Mesh(geo, mat);
-    m.position.set(x, y, z);
-    m.scale.set(sx, sy, sz);
-    m.castShadow = true;
-    body.add(m);
-    return m;
-  }
-
-  // Boots
-  part(new THREE.BoxGeometry(0.42, 0.38, 0.55), gunmetalDark, -0.28, 0.22, 0.06);
-  part(new THREE.BoxGeometry(0.42, 0.38, 0.55), gunmetalDark, 0.28, 0.22, 0.06);
-  // Greaves
-  part(new THREE.CylinderGeometry(0.2, 0.24, 0.85, 8), gunmetal, -0.28, 0.85, 0);
-  part(new THREE.CylinderGeometry(0.2, 0.24, 0.85, 8), gunmetal, 0.28, 0.85, 0);
-  // Thigh plates
-  part(new THREE.BoxGeometry(0.48, 0.7, 0.5), gunmetalDark, -0.28, 1.55, 0);
-  part(new THREE.BoxGeometry(0.48, 0.7, 0.5), gunmetalDark, 0.28, 1.55, 0);
-  // Torso
-  const torso = part(new THREE.BoxGeometry(1.15, 1.35, 0.7), gunmetal, 0, 2.55, 0);
-  part(new THREE.BoxGeometry(0.95, 0.35, 0.78), gunmetalDark, 0, 3.15, 0.05); // chest ridge
-  // Pauldrons
-  part(new THREE.BoxGeometry(0.55, 0.4, 0.55), gunmetalDark, -0.78, 3.15, 0, 1, 1, 1);
-  part(new THREE.BoxGeometry(0.55, 0.4, 0.55), gunmetalDark, 0.78, 3.15, 0, 1, 1, 1);
-  // Arms
-  part(new THREE.CylinderGeometry(0.16, 0.18, 0.9, 7), gunmetal, -0.95, 2.45, 0.05);
-  part(new THREE.CylinderGeometry(0.16, 0.18, 0.9, 7), gunmetal, 0.95, 2.45, 0.05);
-  part(new THREE.BoxGeometry(0.32, 0.35, 0.35), gunmetalDark, -0.95, 1.9, 0.1);
-  part(new THREE.BoxGeometry(0.32, 0.35, 0.35), gunmetalDark, 0.95, 1.9, 0.1);
-
-  // Helmet + cyan visor slit
-  const head = new THREE.Group();
-  head.position.set(0, 3.55, 0);
-  body.add(head);
-  const helm = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.55, 0.68), gunmetalDark);
-  helm.castShadow = true;
-  head.add(helm);
-  const crest = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.35, 0.5), gunmetal);
-  crest.position.set(0, 0.35, -0.05);
-  head.add(crest);
-  const slit = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.08, 0.12), visor);
-  slit.position.set(0, 0.05, 0.32);
-  head.add(slit);
-
-  // Cape plane
-  const cape = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.2), capeMat);
-  cape.position.set(0, 2.4, -0.45);
-  cape.rotation.x = 0.12;
-  body.add(cape);
-
-  // Tiny holographic cathedral trinket in right hand (wireframe boxes)
-  const holo = new THREE.Group();
-  holo.position.set(0.95, 1.85, 0.35);
-  body.add(holo);
-  const holoMat = new THREE.MeshBasicMaterial({
-    color: 0x48e0f0,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.75,
-  });
-  const naveBox = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.45, 0.22), holoMat);
-  holo.add(naveBox);
-  const tower = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.28, 0.1), holoMat);
-  tower.position.set(0, 0.32, 0);
-  holo.add(tower);
-  const spire = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.18, 0.05), holoMat);
-  spire.position.set(0, 0.5, 0);
-  holo.add(spire);
-
-  // Tiny idle patrol — stay on altar platform top (altar ~8 x 5)
-  const patrol = {
-    centerX: baseX,
-    centerY: baseY,
-    centerZ: baseZ,
-    radius: 0.45,
-    angle: 0,
-    speed: 0.18,
-  };
-  const breathBase = body.scale.clone();
-  let lookTimer = 0;
-  let lookingAtCam = false;
-
-  function update(dt, t, cam) {
-    // Breathing
-    const breath = 1 + Math.sin(t * 1.4) * 0.012;
-    body.scale.set(breathBase.x, breathBase.y * breath, breathBase.z);
-
-    // Slow micro-patrol on platform top
-    patrol.angle += dt * patrol.speed;
-    root.position.x = patrol.centerX + Math.cos(patrol.angle) * patrol.radius;
-    root.position.y = patrol.centerY;
-    root.position.z = patrol.centerZ + Math.sin(patrol.angle) * patrol.radius * 0.4;
-    // Face nave (-X) with slight idle sway
-    root.rotation.y = faceYaw + Math.sin(patrol.angle * 0.5) * 0.12;
-
-    // Occasional head turn toward camera
-    lookTimer -= dt;
-    if (lookTimer <= 0) {
-      lookingAtCam = !lookingAtCam;
-      lookTimer = lookingAtCam ? 2.4 + Math.random() * 1.2 : 3.5 + Math.random() * 2.5;
-    }
-    if (lookingAtCam && cam) {
-      const hx = cam.position.x - root.position.x;
-      const hz = cam.position.z - root.position.z;
-      const targetYaw = Math.atan2(hx, hz) - root.rotation.y;
-      head.rotation.y += (Math.max(-0.55, Math.min(0.55, targetYaw)) - head.rotation.y) * Math.min(1, dt * 2.2);
-      head.rotation.x = THREE.MathUtils.lerp(head.rotation.x, -0.08, dt * 1.5);
-    } else {
-      head.rotation.y += (0 - head.rotation.y) * Math.min(1, dt * 1.4);
-      head.rotation.x += (0 - head.rotation.x) * Math.min(1, dt * 1.4);
-    }
-
-    // Soft holo pulse
-    holo.rotation.y = t * 0.8;
-    const pulse = 0.55 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.2));
-    holoMat.opacity = pulse;
-  }
-
-  void torso;
-
-  return { group: root, head, update };
+  return holographicRelics.sentinel(halfL);
 }
 function main() {
   const renderer = new THREE.WebGLRenderer({
@@ -2867,7 +2541,8 @@ function main() {
       }
     }
 
-    marine.update(dt, elapsed, camera);
+    marine.update(dt, elapsed, camera, reducedMotion.matches);
+    holographicRelics.update(elapsed, reducedMotion.matches);
     orrery.update(elapsed, reducedMotion.matches);
 
     // Avoid unused glassPanes lint — kept for future emissive hooks
