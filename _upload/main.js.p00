@@ -1,0 +1,258 @@
+import * as THREE from 'three';
+
+const Spec = {
+  length: 140,
+  width: 26,
+  height: 48,
+  aisle: 8,
+  bays: 8,
+};
+
+/**
+ * Shared procedural void-stone maps (Mac-friendly 512–1024, one set for all stone mats).
+ * @param {number} size
+ * @returns {{ map: THREE.CanvasTexture, roughnessMap: THREE.CanvasTexture, bumpMap: THREE.CanvasTexture }}
+ */
+function makeNoisyStoneMaps(size = 768) {
+  const colorC = document.createElement('canvas');
+  colorC.width = colorC.height = size;
+  const roughC = document.createElement('canvas');
+  roughC.width = roughC.height = size;
+  const bumpC = document.createElement('canvas');
+  bumpC.width = bumpC.height = size;
+  const cctx = colorC.getContext('2d');
+  const rctx = roughC.getContext('2d');
+  const bctx = bumpC.getContext('2d');
+  const cImg = cctx.createImageData(size, size);
+  const rImg = rctx.createImageData(size, size);
+  const bImg = bctx.createImageData(size, size);
+  const cd = cImg.data;
+  const rd = rImg.data;
+  const bd = bImg.data;
+  // Cheap value-noise via layered hash (no deps)
+  const hash = (x, y) => {
+    let n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+    return n - Math.floor(n);
+  };
+  const noise = (x, y) => {
+    const x0 = Math.floor(x);
+    const y0 = Math.floor(y);
+    const fx = x - x0;
+    const fy = y - y0;
+    const u = fx * fx * (3 - 2 * fx);
+    const v = fy * fy * (3 - 2 * fy);
+    const a = hash(x0, y0);
+    const b = hash(x0 + 1, y0);
+    const c = hash(x0, y0 + 1);
+    const d = hash(x0 + 1, y0 + 1);
+    return a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v;
+  };
+  const fbm = (x, y) => {
+    let a = 0;
+    let amp = 0.5;
+    let freq = 1;
+    for (let o = 0; o < 5; o++) {
+      a += amp * noise(x * freq, y * freq);
+      amp *= 0.5;
+      freq *= 2.05;
+    }
+    return a;
+  };
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const i = (y * size + x) * 4;
+      const nx = x / size * 6.5;
+      const ny = y / size * 6.5;
+      const n = fbm(nx, ny);
+      const n2 = fbm(nx * 2.3 + 17.1, ny * 2.3 - 9.4);
+      const pit = Math.pow(Math.max(0, 1 - Math.abs(n2 - 0.42) * 4.2), 2.2);
+      // Weathered purple-void stone tint
+      const baseR = 48 + n * 38 + pit * -18;
+      const baseG = 40 + n * 28 + pit * -14;
+      const baseB = 62 + n * 48 + pit * -8 + n2 * 12;
+      cd[i] = Math.max(0, Math.min(255, baseR | 0));
+      cd[i + 1] = Math.max(0, Math.min(255, baseG | 0));
+      cd[i + 2] = Math.max(0, Math.min(255, baseB | 0));
+      cd[i + 3] = 255;
+      const rough = Math.max(0.35, Math.min(0.98, 0.55 + n * 0.4 + pit * 0.25));
+      const rv = (rough * 255) | 0;
+      rd[i] = rd[i + 1] = rd[i + 2] = rv;
+      rd[i + 3] = 255;
+      const bump = Math.max(0, Math.min(255, ((n * 0.72 + n2 * 0.28 + pit * 0.35) * 255) | 0));
+      bd[i] = bd[i + 1] = bd[i + 2] = bump;
+      bd[i + 3] = 255;
+    }
+  }
+  cctx.putImageData(cImg, 0, 0);
+  rctx.putImageData(rImg, 0, 0);
+  bctx.putImageData(bImg, 0, 0);
+  const wrap = (tex) => {
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(4, 4);
+    tex.anisotropy = 4;
+    tex.needsUpdate = true;
+    return tex;
+  };
+  const map = wrap(new THREE.CanvasTexture(colorC));
+  map.colorSpace = THREE.SRGBColorSpace;
+  const roughnessMap = wrap(new THREE.CanvasTexture(roughC));
+  const bumpMap = wrap(new THREE.CanvasTexture(bumpC));
+  return { map, roughnessMap, bumpMap };
+}
+
+const _stoneMaps = makeNoisyStoneMaps(768);
+
+const stone = new THREE.MeshStandardMaterial({
+  color: 0xb8aec8,
+  map: _stoneMaps.map,
+  roughnessMap: _stoneMaps.roughnessMap,
+  bumpMap: _stoneMaps.bumpMap,
+  bumpScale: 0.085,
+  roughness: 0.92,
+  metalness: 0.04,
+});
+const stoneDark = new THREE.MeshStandardMaterial({
+  color: 0x7a7088,
+  map: _stoneMaps.map,
+  roughnessMap: _stoneMaps.roughnessMap,
+  bumpMap: _stoneMaps.bumpMap,
+  bumpScale: 0.1,
+  roughness: 0.95,
+  metalness: 0.03,
+});
+const stoneWarm = new THREE.MeshStandardMaterial({
+  color: 0xc4a8c8,
+  map: _stoneMaps.map,
+  roughnessMap: _stoneMaps.roughnessMap,
+  bumpMap: _stoneMaps.bumpMap,
+  bumpScale: 0.09,
+  roughness: 0.88,
+  metalness: 0.05,
+});
+const metal = new THREE.MeshStandardMaterial({
+  color: 0x6a5e48,
+  roughness: 0.45,
+  metalness: 0.72,
+});
+const flameMat = new THREE.MeshStandardMaterial({
+  color: 0xffa0d0,
+  emissive: 0xd050ff,
+  emissiveIntensity: 1.9,
+  roughness: 1,
+  metalness: 0,
+});
+const glassMats = [
+  new THREE.MeshStandardMaterial({ color: 0xc070e0, emissive: 0x8030c0, emissiveIntensity: 1.35, roughness: 0.5, metalness: 0 }),
+  new THREE.MeshStandardMaterial({ color: 0x9060ff, emissive: 0x5020d0, emissiveIntensity: 1.4, roughness: 0.5, metalness: 0 }),
+  new THREE.MeshStandardMaterial({ color: 0xe090ff, emissive: 0xa040e0, emissiveIntensity: 1.25, roughness: 0.5, metalness: 0 }),
+  new THREE.MeshStandardMaterial({ color: 0x7050c8, emissive: 0x4020a0, emissiveIntensity: 1.3, roughness: 0.5, metalness: 0 }),
+];
+
+const clothRed = new THREE.MeshStandardMaterial({
+  color: 0x5a1820,
+  roughness: 0.92,
+  metalness: 0.02,
+  side: THREE.DoubleSide,
+});
+const clothBone = new THREE.MeshStandardMaterial({
+  color: 0xc8b898,
+  roughness: 0.88,
+  metalness: 0.02,
+  side: THREE.DoubleSide,
+});
+const parchment = new THREE.MeshStandardMaterial({
+  color: 0xc4a878,
+  roughness: 0.95,
+  metalness: 0,
+});
+const waxRed = new THREE.MeshStandardMaterial({
+  color: 0x8a1820,
+  emissive: 0x501018,
+  emissiveIntensity: 0.55,
+  roughness: 0.65,
+  metalness: 0.05,
+});
+const bone = new THREE.MeshStandardMaterial({
+  color: 0xd0c4a8,
+  roughness: 0.78,
+  metalness: 0.02,
+});
+const crateWood = new THREE.MeshStandardMaterial({
+  color: 0x4a3a28,
+  roughness: 0.9,
+  metalness: 0.04,
+});
+const cableMat = new THREE.MeshStandardMaterial({
+  color: 0x2a2a30,
+  roughness: 0.7,
+  metalness: 0.35,
+});
+const leadMat = new THREE.MeshStandardMaterial({
+  color: 0x12141a,
+  roughness: 0.55,
+  metalness: 0.65,
+});
+const ringMetal = new THREE.MeshStandardMaterial({
+  color: 0x8a7a5a,
+  roughness: 0.4,
+  metalness: 0.78,
+});
+const aquilaDark = new THREE.MeshStandardMaterial({
+  color: 0x2a2c34,
+  roughness: 0.48,
+  metalness: 0.82,
+});
+const aquilaBone = new THREE.MeshStandardMaterial({
+  color: 0xc8bca0,
+  roughness: 0.72,
+  metalness: 0.08,
+});
+const aquilaGold = new THREE.MeshStandardMaterial({
+  color: 0xc8a848,
+  emissive: 0x8a6820,
+  emissiveIntensity: 0.55,
+  roughness: 0.38,
+  metalness: 0.85,
+});
+// Apse stained-glass textures (Illustrator art) — loaded once, shared with glass mats
+const APSE_GLASS_URL = './assets/stained-glass/vc-apse-glass-01.png';
+const APSE_ROSE_URL = './assets/stained-glass/vc-apse-glass-02-rose.png';
+const _apseGlassLoader = new THREE.TextureLoader();
+let _apseGlassTex = null;
+let _apseRoseTex = null;
+function loadApseGlassTexture() {
+  if (_apseGlassTex) return _apseGlassTex;
+  const tex = _apseGlassLoader.load(APSE_GLASS_URL);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  _apseGlassTex = tex;
+  return tex;
+}
+function loadApseRoseTexture() {
+  if (_apseRoseTex) return _apseRoseTex;
+  const tex = _apseGlassLoader.load(APSE_ROSE_URL);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  _apseRoseTex = tex;
+  return tex;
+}
+
+// Illustrator heraldry pack (altar / floor / seals / glass accents)
+const HERALDRY_BASE = './assets/heraldry/';
+const HERALDRY_URLS = {
+  altarCloth: HERALDRY_BASE + 'vc-altar-cloth-01.png',
+  floorMedallion: HERALDRY_BASE + 'vc-floor-medallion-01.png',
+  floorRunner: HERALDRY_BASE + 'vc-floor-runner-01.png',
+  clerestory: HERALDRY_BASE + 'vc-clerestory-01.png',
+  puritySeal: HERALDRY_BASE + 'vc-purity-seal-01.png',
+  shipCrest: HERALDRY_BASE + 'vc-ship-crest-01.png',
+  oculus: HERALDRY_BASE + 'vc-oculus-01.png',
+  wallRelief: HERALDRY_BASE + 'vc-wall-relief-01.png',
+  censer: HERALDRY_BASE + 'vc-censer-01.png',
+};
+const _heraldryLoader = new THREE.TextureLoader();
+/** @type {Record<string, THREE.Texture>} */
+const _heraldryTexCache = {};
+/**
+ * @param {keyof typeof HERALDRY_URLS} key
+ * @
