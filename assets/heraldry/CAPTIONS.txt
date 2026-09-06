@@ -1,0 +1,12 @@
+A REQUIRED
+vc-altar-cloth-01.png — 1024x1024 altar cloth: gold compass/orbit embroidery on purple velvet with cyan stitches.
+vc-floor-medallion-01.png — 1024x1024 circular void-heraldry floor inlay: gold compass crest, cyan gems on purple marble.
+vc-floor-runner-01.png — 512x2048 processional runner: repeating gothic arches gold/cyan on purple, soft faded ends.
+
+B SURPRISE
+vc-clerestory-01.png — Tall lancet clerestory glass pane: nebula purple, cyan wings, sacred geometry seal.
+vc-purity-seal-01.png — Parchment purity seal: compass medallion, gold wax with cyan drip (no readable text).
+vc-ship-crest-01.png — Void-ship crest plaque: gold/black relief, cyan gems, orbit rings.
+vc-oculus-01.png — Side-chapel oculus: circular rose with cyan crescents and gold constellations.
+vc-wall-relief-01.png — Invented twin-void wing wall relief with cyan eye-gem (not an aquila copy).
+vc-censer-01.png — Ornate hanging censer emblem: gold gothic, purple smoke, cyan flame.

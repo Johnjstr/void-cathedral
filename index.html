@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Void Cathedral — Flythrough</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0c1018; }
+    canvas { display: block; width: 100%; height: 100%; }
+    #hud {
+      position: fixed;
+      left: 0; right: 0; bottom: 1.4rem;
+      text-align: center;
+      pointer-events: none;
+      font-family: "Palatino Linotype", Palatino, "Times New Roman", serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(220, 200, 170, 0.65);
+      text-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+      user-select: none;
+    }
+    #title {
+      position: fixed;
+      top: 1.2rem; left: 0; right: 0;
+      text-align: center;
+      pointer-events: none;
+      font-family: "Palatino Linotype", Palatino, "Times New Roman", serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(200, 180, 150, 0.5);
+      text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      user-select: none;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="title">Void Cathedral</div>
+  <div id="hud">Multi-rail watch · Illustrator heraldry + banners · apse glass + twin roses · altar cloth · floor medallion/runner · Bastion · bot floaters · local three</div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
