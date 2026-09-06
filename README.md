@@ -19,6 +19,14 @@ Five sequential FULL-length camera rails on load (~45–55s each: center low for
 
 Optional: drag to look.
 
+Use **View sculpture** to jump directly to the apse and hold the camera while
+the Orrery animates. **Cathedral tour** resumes the full flythrough. The detail
+view can also be opened with `?view=orrery`.
+
+For a development preview, run `npm ci` then `npm run dev`. The existing Python
+static-server option still works without Node. `npm run build` copies the
+complete static scene and its local assets into `dist/` for hosting.
+
 ## Void Orrery centerpiece
 
 The block-built Aquila and its dark backing plate in front of the apse glass

@@ -1,0 +1,13 @@
+{
+  "name": "void-cathedral",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/build-static.mjs",
+    "test": "node --test tests/void-orrery.test.mjs"
+  },
+  "devDependencies": {
+    "vite": "7.3.6"
+  }
+}

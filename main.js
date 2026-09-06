@@ -2613,9 +2613,14 @@ function main() {
 
   const { lights, flames, banners, floaters, glassPanes, shafts, dust } = buildCathedral(scene);
   const rails = buildRails();
-  let railIndex = 0;
-  let t = 0;
-  let holding = false;
+  // A shareable detail view for reviewing the centerpiece without waiting
+  // through the full camera tour. The sculpture and scene remain animated.
+  const detailView = new URLSearchParams(window.location.search).get('view') === 'orrery';
+  document.querySelector(detailView ? '#views a[href="?view=orrery"]' : '#views a[href="./"]')
+    ?.setAttribute('aria-current', 'page');
+  let railIndex = detailView ? 4 : 0;
+  let t = detailView ? 0.999 : 0;
+  let holding = detailView;
   let holdTimer = 0;
 
   const halfL = Spec.length / 2;
@@ -2692,12 +2697,12 @@ function main() {
     const rail = rails[railIndex];
 
     // Multi-rail sequence: finish rail → optional hold → next; wrap last → 0
-    if (holding) {
+    if (holding && !detailView) {
       holdTimer += dt;
       if (holdTimer >= (rail.holdSec || 0)) {
         advanceRail();
       }
-    } else {
+    } else if (!detailView) {
       t += (dt * rail.speed) / rail.durationSec;
       if (t >= 1) {
         t = 1;
