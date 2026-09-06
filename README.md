@@ -19,6 +19,39 @@ Five sequential FULL-length camera rails on load (~45–55s each: center low for
 
 Optional: drag to look.
 
+## Void Orrery centerpiece
+
+The block-built Aquila and its dark backing plate in front of the apse glass
+are replaced by a suspended **Void Orrery**: a translucent violet/cyan planet
+shell, fine latitude/longitude contours, four gold/cyan orbital rings, three
+crescent arcs, an inner star atlas, and a small orbiting satellite. The glass
+remains visible through the open sculpture. Bastion remains on the altar below.
+
+`void-orrery.js` exports `createVoidOrrery(center)`, with `group`,
+`update(elapsed, reducedMotion)`, and `dispose()` for reuse. It uses the existing
+vendored Three.js and render loop, with no added lights, textures, network
+requests, dependencies, or postprocessing. Its animation respects the system's
+reduced-motion setting; the existing cathedral flythrough still moves.
+
+The sculpture is centered at `(60.8, 12.5, 0)` within a 3.5-unit radius. This
+keeps it forward of the glass/wash, beyond the camera and bot travel limits,
+and above Bastion. Existing camera rails, glass artwork, and lighting remain.
+
+Validation (Node.js 22+):
+
+```bash
+node --test tests/void-orrery.test.mjs
+node --check main.js
+node --check void-orrery.js
+```
+
+Tests sample ten minutes of animation for spatial clearance, check geometry
+and draw-cost limits, and verify reduced motion and resource disposal. These
+are CPU checks; GPU shader rendering and visual appearance still need review
+in a WebGL browser on the target machine. Review the final ceremonial rail
+and side rails for transparency, glass readability, and frame rate. The scene
+maintainer can roll back the centerpiece by reverting its change commit.
+
 ## Stack
 
 - three.js `0.170.0` local (`vendor/three.module.js`)
@@ -52,6 +85,6 @@ Purple-void lighting, Bastion, twin roses, multi-rails, and bot clearance unchan
 
 ## Details
 
-Procedural low-poly relics along the nave: banner poles with tattered cloth + Aquila/winged-skull emblems (subtle sway), denser purity-seal ribbons and hanging seal chains, column and wall Aquila plaques, servo-arm brackets, skull niches and piles, sarcophagus tombs with Aquila lid reliefs, Illustrator floor medallion + processional runner, apse Aquila behind Bastion + void-ship crest plaques beside the glass, billboard Grok Bot icon floaters on separated CatmullRom patrols with soft XZ collision push + altar cable clutter, stacked relic crates, denser hanging censers, a full-body power-armored cathedral marine (Bastion / Three) on the raised altar/apse platform under the stained glass, and a large Illustrator apse stained-glass window as the final rail destination. Seals/embers/gold trim use emissive meshes — PointLight count ~27.
+Procedural low-poly relics along the nave: banner poles with tattered cloth + Aquila/winged-skull emblems (subtle sway), denser purity-seal ribbons and hanging seal chains, column and wall Aquila plaques, servo-arm brackets, skull niches and piles, sarcophagus tombs with Aquila lid reliefs, Illustrator floor medallion + processional runner, Void Orrery above Bastion + void-ship crest plaques beside the glass, billboard Grok Bot icon floaters on separated CatmullRom patrols with soft XZ collision push + altar cable clutter, stacked relic crates, denser hanging censers, a full-body power-armored cathedral marine (Bastion / Three) on the raised altar/apse platform under the stained glass, and a large Illustrator apse stained-glass window as the final rail destination. Seals/embers/gold trim use emissive meshes — PointLight count ~27.
 
 Banners use fresh Illustrator void-cathedral hanging art (nave glass, sentinel, crest, crane vault, pillar, cloaked walker) — not Aquila badges or old portraits. Pillars/walls still carry Aquila heraldry.

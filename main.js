@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createVoidOrrery } from './void-orrery.js';
 
 const Spec = {
   length: 140,
@@ -1584,19 +1585,8 @@ function addRelicDetails(group, ctx) {
     }
   }
 
-  // Aquila behind Bastion on apse face (facing nave); Bastion stays on altar top
-  {
-    const apseEagle = makeAquila(2.4);
-    apseEagle.position.set(halfL - 5.35, 11.2, 0);
-    apseEagle.rotation.y = -Math.PI / 2;
-    group.add(apseEagle);
-    const plaqueBack = new THREE.Mesh(
-      new THREE.BoxGeometry(0.2, 5.2, 4.2),
-      aquilaDark,
-    );
-    plaqueBack.position.set(halfL - 5.15, 11.0, 0);
-    group.add(plaqueBack);
-  }
+  // The apse emblem is now an open celestial sculpture, added in main() so
+  // its animation uses the existing render loop. Other Aquila reliefs remain.
 
   // Processional floor medallion (Illustrator) — replaces tiny Aquila floor eagle
   {
@@ -2634,6 +2624,11 @@ function main() {
   const floaterObs = getFloaterObstacles();
   const marine = makeCathedralMarine(halfL);
   scene.add(marine.group);
+  // x=60.8: the complete 3.5u envelope clears glass/wash (x>=64.45),
+  // camera rails (x<=56), bot patrols (x<=52), and Bastion (top ~7.9).
+  const orrery = createVoidOrrery(new THREE.Vector3(halfL - 9.2, 12.5, 0));
+  scene.add(orrery.group);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const lookOffset = { yaw: 0, pitch: 0 };
   let dragging = false;
@@ -2868,6 +2863,7 @@ function main() {
     }
 
     marine.update(dt, elapsed, camera);
+    orrery.update(elapsed, reducedMotion.matches);
 
     // Avoid unused glassPanes lint — kept for future emissive hooks
     void glassPanes;
