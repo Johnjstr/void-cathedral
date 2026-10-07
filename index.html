@@ -34,6 +34,18 @@
       text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
       user-select: none;
     }
+    #views {
+      position: fixed; bottom: 3.5rem; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 0.65rem;
+      font: 0.875rem/1.4 system-ui, sans-serif;
+    }
+    #views a {
+      color: #f1ddbd; background: rgba(16, 8, 24, 0.82);
+      padding: 0.65rem 1rem; border: 1px solid #8b719b;
+      border-radius: 2rem; text-decoration: none;
+    }
+    #views a:hover, #views a[aria-current="page"] { background: #412454; }
+    #views a:focus-visible { outline: 2px solid #a2eaff; outline-offset: 3px; }
   </style>
   <script type="importmap">
   {
@@ -45,7 +57,11 @@
 </head>
 <body>
   <div id="title">Void Cathedral</div>
-  <div id="hud">Multi-rail watch · Illustrator heraldry + banners · apse glass + twin roses · altar cloth · floor medallion/runner · Bastion · bot floaters · local three</div>
+  <div id="hud">Follow the light · Drag to look around</div>
+  <nav id="views" aria-label="Camera view">
+    <a href="./">Cathedral tour</a>
+    <a href="?view=orrery">View sculpture</a>
+  </nav>
   <script type="module" src="./main.js"></script>
 </body>
 </html>

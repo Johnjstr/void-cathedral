@@ -19,6 +19,47 @@ Five sequential FULL-length camera rails on load (~45–55s each: center low for
 
 Optional: drag to look.
 
+Use **View sculpture** to jump directly to the apse and hold the camera while
+the Orrery animates. **Cathedral tour** resumes the full flythrough. The detail
+view can also be opened with `?view=orrery`.
+
+For a development preview, run `npm ci` then `npm run dev`. The existing Python
+static-server option still works without Node. `npm run build` copies the
+complete static scene and its local assets into `dist/` for hosting.
+
+## Void Orrery centerpiece
+
+The block-built Aquila and its dark backing plate in front of the apse glass
+are replaced by a suspended **Void Orrery**: a translucent violet/cyan planet
+shell, fine latitude/longitude contours, four gold/cyan orbital rings, three
+crescent arcs, an inner star atlas, and a small orbiting satellite. The glass
+remains visible through the open sculpture. Bastion remains on the altar below.
+
+`void-orrery.js` exports `createVoidOrrery(center)`, with `group`,
+`update(elapsed, reducedMotion)`, and `dispose()` for reuse. It uses the existing
+vendored Three.js and render loop, with no added lights, textures, network
+requests, dependencies, or postprocessing. Its animation respects the system's
+reduced-motion setting; the existing cathedral flythrough still moves.
+
+The sculpture is centered at `(60.8, 12.5, 0)` within a 3.5-unit radius. This
+keeps it forward of the glass/wash, beyond the camera and bot travel limits,
+and above Bastion. Existing camera rails, glass artwork, and lighting remain.
+
+Validation (Node.js 22+):
+
+```bash
+npm test
+node --check main.js
+node --check void-orrery.js
+```
+
+Tests sample ten minutes of animation for spatial clearance, check geometry
+and draw-cost limits, and verify reduced motion and resource disposal. These
+are CPU checks; GPU shader rendering and visual appearance still need review
+in a WebGL browser on the target machine. Review the final ceremonial rail
+and side rails for transparency, glass readability, and frame rate. The scene
+maintainer can roll back the centerpiece by reverting its change commit.
+
 ## Stack
 
 - three.js `0.170.0` local (`vendor/three.module.js`)
@@ -52,6 +93,32 @@ Purple-void lighting, Bastion, twin roses, multi-rails, and bot clearance unchan
 
 ## Details
 
-Procedural low-poly relics along the nave: banner poles with tattered cloth + Aquila/winged-skull emblems (subtle sway), denser purity-seal ribbons and hanging seal chains, column and wall Aquila plaques, servo-arm brackets, skull niches and piles, sarcophagus tombs with Aquila lid reliefs, Illustrator floor medallion + processional runner, apse Aquila behind Bastion + void-ship crest plaques beside the glass, billboard Grok Bot icon floaters on separated CatmullRom patrols with soft XZ collision push + altar cable clutter, stacked relic crates, denser hanging censers, a full-body power-armored cathedral marine (Bastion / Three) on the raised altar/apse platform under the stained glass, and a large Illustrator apse stained-glass window as the final rail destination. Seals/embers/gold trim use emissive meshes — PointLight count ~27.
+Holographic celestial seals replace the block-built column and wall emblems.
+Niches and former skull clusters contain luminous memory orbs; the crate stacks
+are suspended crystal/orb reliquaries. Folded servo-arm ornaments become
+prismatic seals. Side-aisle tombs have smooth oval stone bodies and floating
+seal reliefs. Illustrated wall artwork keeps its texture with thin circular
+frames replacing heavy backing plates.
 
-Banners use fresh Illustrator void-cathedral hanging art (nave glass, sentinel, crest, crane vault, pillar, cloaked walker) — not Aquila badges or old portraits. Pillars/walls still carry Aquila heraldry.
+Bastion is now a smooth translucent guardian with curved limbs, a cyan visor,
+a gold halo, a projected chest seal, and a small orbital relic held in his hand.
+His original altar placement is preserved, below the large Void Orrery.
+
+`holographic-relics.js` supplies a shared seal/relic/sentinel factory and a
+single material clock. Instances reuse eight geometries and five materials,
+with no added lights, runtime dependencies, textures, or animation loops.
+Reduced motion freezes the new decorative animations and guardian idle motion;
+the original camera tour and existing ambience retain their behavior.
+
+Run `npm test` for both the centerpiece and decoration suites. Ten minutes of
+sampled motion verify that wall seals remain shallow, standalone relics stay
+within their local envelopes, and Bastion stays on the altar below the Orrery.
+Tests also verify finite geometry, shared resources, and disposal. Browser GPU
+appearance remains for review on the target device (the cloud preview browser
+has WebGL disabled). Revert the decoration change commit to restore the prior
+models; the previous hosted version also remains available for rollback.
+
+Stone architecture, original stained glass, illustrated banners, floor heraldry,
+cloth, candle/chandelier lighting, and bot icon floaters retain their designs.
+
+Banners use fresh Illustrator void-cathedral hanging art (nave glass, sentinel, crest, crane vault, pillar, cloaked walker) — not Aquila badges or old portraits. Pillars/walls carry animated celestial seals.
